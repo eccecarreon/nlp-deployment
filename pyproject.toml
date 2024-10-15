@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "nlp-deployment"
+version = "1.0.0"
+description = ""
+authors = ["eccecarreon <153371886+eccecarreon@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
