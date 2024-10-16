@@ -1,2 +1,2 @@
 # nlp-deployment
- via streamlit app
+nlp time series and sentiment analysis via streamlit app
