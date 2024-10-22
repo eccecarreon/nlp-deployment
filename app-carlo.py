@@ -11,7 +11,7 @@ from lime.lime_text import LimeTextExplainer
 st.image('images/hero.jpg', use_column_width=True)
 
 # Load time series data
-df_resampled = pd.read_csv('data/reviews_processed_tsa.csv')
+df_resampled = pd.read_csv('data/reviews_processed.csv')
 df_resampled.set_index('date', inplace=True)
 
 # Add app title
@@ -58,6 +58,16 @@ st.plotly_chart(fig, use_container_width=True)
 # Load the Naive Bayes model and TF-IDF vectors for sentiment analysis
 naiveBayesModel = joblib.load('models/naive-bayes_model.pkl')
 vectorizerTFIdf = joblib.load('models/vectorizer.pkl')
+
+from sklearn.utils.validation import check_is_fitted
+
+# Load vectorizer and model
+vectorizerTFIdf = joblib.load('models/vectorizer.pkl')
+try:
+    check_is_fitted(vectorizerTFIdf, attributes=['idf_'])
+    st.write("Vectorizer loaded and is fitted.")
+except:
+    st.write("Error: Vectorizer is not properly fitted.")
 
 # Instantiate VADER
 vader = SentimentIntensityAnalyzer()
