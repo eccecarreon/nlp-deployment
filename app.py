@@ -1,3 +1,152 @@
+# import streamlit as st
+# import pandas as pd
+# import plotly.graph_objects as go
+# import joblib
+# import nltk
+# nltk.download('vader_lexicon')
+# from nltk.sentiment.vader import SentimentIntensityAnalyzer
+# from lime.lime_text import LimeTextExplainer
+
+# # Add hero image
+# st.image('images/hero.jpg', use_column_width=True)
+
+# # Load time series data
+# df_resampled = pd.read_csv('data/reviews_processed.csv')
+# df_resampled.set_index('date', inplace=True)
+
+# # Add app title
+# st.title('Time Series Analysis Customer Reviews for Sandbar')
+
+# # User input for the time frame selection and sentiment analysis
+# st.subheader('Select a Time Frame')
+# time_frame = st.slider('Time Frame (3-Month Moving Average)',
+#                        min_value=-1,
+#                        max_value=(len(df_resampled)),
+#                        step=3)
+
+# # Resample the data according to user-selected time frame
+# resampled_data = df_resampled['stars'].rolling(window=time_frame).mean()
+
+# # Plot the time series data
+# fig = go.Figure()
+
+# fig.add_trace(go.Scatter(
+#     x=df_resampled.index,
+#     y=df_resampled['stars'],
+#     mode='lines',
+#     name='Monthly Average'
+# ))
+
+# # Add 3-Month Moving Average
+# fig.add_trace(go.Scatter(
+#     x=df_resampled.index,
+#     y=resampled_data,
+#     mode='lines',
+#     name=f'{time_frame}-Month Moving Average'
+# ))
+
+# # Add title and labels
+# fig.update_layout(
+#     title=f'Average Star Rating Over Time with {time_frame}-Monthly Moving Average',
+#     xaxis_title='Time',
+#     yaxis_title='Average Star Rating',
+# )
+
+# # Display plot
+# st.plotly_chart(fig, use_container_width=True)
+
+# # Sentiment Analysis
+
+# # Load Naive Bayes model and TF-IDF Vectorizer
+# naiveBayesModel = joblib.load('models/naive_bayes_model.pkl')
+# vectorizerTFIDF = joblib.load('models/vectorizer.pkl')
+
+# # Instantiate VADER
+# vader = SentimentIntensityAnalyzer()
+
+# # Instantiate the LIME text explainer
+# lime_explainer = LimeTextExplainer(class_names=['Positive', 'Neutral', 'Negative'])
+
+# # Function to get the predictions from Naive Bayes and VADER
+# def get_model_prediction(text):
+
+#     # VADER prediction
+#     vader_scores = vader.polarity_scores(text)
+#     vader_sentiment = max(vader_scores, key=vader_scores.get)
+
+#     # Naive Bayes
+#     naiveBayesVectorizer = vectorizerTFIDF.transform([text])
+#     naiveBayesPrediction = naiveBayesModel.predict(naiveBayesVectorizer)[0]
+
+#     return {
+#         'VADER': vader_sentiment,
+#         'Naive Bayes': naiveBayesPrediction
+#     }, vader_scores
+
+# # Function to predict probabilities and explain using LIME
+# def predict_proba(texts):
+
+#     return naiveBayesModel.predict_proba(vectorizerTFIDF.transform(texts))
+
+# # Sentiment Analysis
+# st.header('Sentiment Analysis')
+
+# # User text input
+# user_input = st.text_area('Enter text for sentiment analysis')
+
+# # Predict sentiment
+# if st.button('Analyze'):
+
+#     if user_input:
+
+#         # Get predictions
+#         predictions, vaderScores = get_model_prediction(text=user_input)
+
+#         # Display predictions
+#         st.write(f'VADER Sentiment: {predictions["VADER"]}')
+#         st.write(f'Naive Bayes Sentiment: {predictions["Naive Bayes"]}')
+
+#         # Visualize model confidence
+#         fig = go.Figure()
+
+#         # Add VADER confidence
+#         fig.add_trace(go.Bar(
+#             x=list(vaderScores.keys()),
+#             y=list(vaderScores.value()),
+#             name='VADER Scores'
+#         ))
+
+#         # Add Naive Bayes confidence
+#         fig.add_trace(go.Bar(
+#             x=['Naive Bayes'],
+#             y=[1 if predictions['Naive Bayes'] == 'Positive' else 0],
+#             name='Naive Bayes Scores'
+#         ))
+
+#         fig.update_layout(
+#             title = 'Model Sentiment Comparison',
+#             xaxis_title = 'Models',
+#             yaxis_title = 'Confidence Levels',
+#         )
+
+#         st.plotly_chart(fig, use_container_width=True)
+
+#         # LIME
+#         st.subheader('LIME Explanation fo Naive Bayes')
+#         explainer = lime_explainer.explain_instance(
+#             user_input,
+#             predict_proba,
+#             num_features=10
+#         )
+
+#         explainer_html = explainer.as_html()
+
+#         # Display LIME explanation
+#         st.components/v1.html(explainer_html)
+
+#     else:
+#         st.write('Please provide text to analyze')
+
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -7,7 +156,7 @@ nltk.download('vader_lexicon')
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from lime.lime_text import LimeTextExplainer
 
-# Add hero image
+# Add a hero image
 st.image('images/hero.jpg', use_column_width=True)
 
 # Load time series data
@@ -15,16 +164,16 @@ df_resampled = pd.read_csv('data/reviews_processed.csv')
 df_resampled.set_index('date', inplace=True)
 
 # Add app title
-st.title('Time Series Analysis Customer Reviews for Sandbar')
+st.title('Time Series Analysis Customer Review for Sandbar')
 
-# User input for the time frame selection and sentiment analysis
+# User input for the time frame selection and sentiment analysis (positive/negative)
 st.subheader('Select a Time Frame')
-time_frame = st.slider('Time Frame (3-Month Moving Average)',
-                       min_value=-1,
+time_frame = st.slider('Time Frame (Months)',
+                       min_value=1,
                        max_value=(len(df_resampled)),
-                       step=3)
+                       step=1)
 
-# Resample the data according to user-selected time frame
+# Resample data according to the user-selected time frame
 resampled_data = df_resampled['stars'].rolling(window=time_frame).mean()
 
 # Plot the time series data
@@ -37,7 +186,7 @@ fig.add_trace(go.Scatter(
     name='Monthly Average'
 ))
 
-# Add 3-Month Moving Average
+# Add moving averages to the plot as lines on top
 fig.add_trace(go.Scatter(
     x=df_resampled.index,
     y=resampled_data,
@@ -45,104 +194,103 @@ fig.add_trace(go.Scatter(
     name=f'{time_frame}-Month Moving Average'
 ))
 
-# Add title and labels
+# Add title and labels to the plot
 fig.update_layout(
-    title=f'Average Star Rating Over Time with {time_frame}-Monthly Moving Average',
-    xaxis_title='Time',
-    yaxis_title='Average Star Rating',
+    title = f'Average Star Rating Over Time with {time_frame}-Monthly Moving Average',
+    xaxis_title = 'Time',
+    yaxis_title = 'Average Star Rating',
 )
 
-# Display plot
+# Show the plot
 st.plotly_chart(fig, use_container_width=True)
 
-# Sentiment Analysis
-
-# Load Naive Bayes model and TF-IDF Vectorizer
+# Load the Naive Bayes model and TF-IDF vectors for sentiment analysis
 naiveBayesModel = joblib.load('models/naive_bayes_model.pkl')
-vectorizerTFIDF = joblib.load('models/vectorizer.pkl')
+vectorizerTFIdf = joblib.load('models/vectorizer.pkl')  # Make sure the filename matches
+print(f"IDF attribute present: {'idf_' in dir(vectorizerTFIdf)}")  # Should print True
+
 
 # Instantiate VADER
 vader = SentimentIntensityAnalyzer()
 
-# Instantiate the LIME text explainer
+# Initialize LIME text explainer
 lime_explainer = LimeTextExplainer(class_names=['Positive', 'Neutral', 'Negative'])
 
-# Function to get the predictions from Naive Bayes and VADER
+# Function to get the predictions from VADER and Naive Bayes
 def get_model_prediction(text):
-
+    
     # VADER prediction
     vader_scores = vader.polarity_scores(text)
     vader_sentiment = max(vader_scores, key=vader_scores.get)
-
-    # Naive Bayes
-    naiveBayesVectorizer = vectorizerTFIDF.transform([text])
+    
+    # Naive Bayes prediction
+    naiveBayesVectorizer = vectorizerTFIdf.transform([text])
     naiveBayesPrediction = naiveBayesModel.predict(naiveBayesVectorizer)[0]
-
+    
     return {
         'VADER': vader_sentiment,
         'Naive Bayes': naiveBayesPrediction
     }, vader_scores
-
-# Function to predict probabilities and explain using LIME
+    
+# Function to predict probabilities and explain them with LIME
 def predict_proba(texts):
+    return naiveBayesModel.predict_proba(vectorizerTFIdf.transform(texts))
 
-    return naiveBayesModel.predict_proba(vectorizerTFIDF.transform(texts))
-
-# Sentiment Analysis
+# Sentiment analysis with LIME
 st.header('Sentiment Analysis')
 
 # User text input
-user_input = st.text_area('Enter text for sentiment analysis')
+user_input = st.text_area('Enter text for sentiment analysis:')
 
 # Predict sentiment
 if st.button('Analyze'):
-
+    
     if user_input:
-
+        
         # Get predictions
-        predictions, vaderScores = get_model_prediction(text=user_input)
-
-        # Display predictions
+        predictions, vaderScores = get_model_prediction(user_input)
+        
+        # Display the predictions
         st.write(f'VADER Sentiment: {predictions["VADER"]}')
         st.write(f'Naive Bayes Sentiment: {predictions["Naive Bayes"]}')
-
+        
         # Visualize model confidence
         fig = go.Figure()
-
+        
         # Add VADER confidence
         fig.add_trace(go.Bar(
             x=list(vaderScores.keys()),
-            y=list(vaderScores.value()),
+            y=list(vaderScores.values()),
             name='VADER Scores'
         ))
-
+        
         # Add Naive Bayes confidence
         fig.add_trace(go.Bar(
             x=['Naive Bayes'],
             y=[1 if predictions['Naive Bayes'] == 'Positive' else 0],
-            name='Naive Bayes Scores'
+            name='Naive Bayes Score'
         ))
-
+        
         fig.update_layout(
             title = 'Model Sentiment Comparison',
             xaxis_title = 'Models',
             yaxis_title = 'Confidence Levels',
         )
-
+        
         st.plotly_chart(fig, use_container_width=True)
-
-        # LIME
-        st.subheader('LIME Explanation fo Naive Bayes')
-        explainer = lime_explainer.explain_instance(
+        
+        # LIME Explainer
+        st.subheader('LIME Explanation for Naive Bayes')
+        exp = lime_explainer.explain_instance(
             user_input,
             predict_proba,
             num_features=10
         )
-
-        explainer_html = explainer.as_html()
-
-        # Display LIME explanation
-        st.components/v1.html(explainer_html)
-
+        
+        exp_html = exp.as_html()       
+        
+        # Display LIME Explanation
+        st.components.v1.html(exp_html)
+        
     else:
-        st.write('Please provide text to analyze')
+        st.write('Please provide text for sentiment analysis')
